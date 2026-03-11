@@ -1,0 +1,443 @@
+/* style.css - Diseño limpio, femenino y responsive */
+:root {
+    /* Paleta de colores: Suaves y femeninos */
+    --cream: #fdfbf7;
+    --old-rose: #d695a1; /* Rosa viejo suave */
+    --terracotta: #cc7863;
+    --text-dark: #4a4143;
+    --text-light: #7a7072;
+    --white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--cream);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* Titulares elegantes usando Playfair Display */
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--old-rose);
+}
+
+/* --- Header --- */
+header {
+    background-color: var(--white);
+    padding: 1.5rem 5%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header h1 {
+    font-size: 2.2rem;
+    letter-spacing: 1px;
+}
+
+/* --- Hero Section --- */
+.hero {
+    /* Fondo con una imagen elegante y capa superpuesta para fácil lectura */
+    background: linear-gradient(rgba(253, 251, 247, 0.7), rgba(253, 251, 247, 0.7)), url('https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=1200&q=80') center/cover;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.hero h2 {
+    font-size: 2.8rem;
+    color: var(--terracotta);
+    margin-bottom: 1rem;
+    max-width: 800px;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    max-width: 600px;
+    color: var(--text-dark);
+}
+
+/* --- Cards Section (Grid & Flexbox) --- */
+.products-section {
+    padding: 4rem 5%;
+    text-align: center;
+}
+
+.products-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--terracotta);
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile First: 1 columna */
+    gap: 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.card img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 2rem 1.5rem;
+    flex-grow: 1;
+}
+
+.card-content h3 {
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.card-content p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.full-desc {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease-in-out;
+}
+
+.hidden {
+    display: none;
+}
+
+.read-more-btn {
+    background-color: transparent;
+    color: var(--terracotta);
+    border: 2px solid var(--terracotta);
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    display: inline-block;
+}
+
+.read-more-btn:hover {
+    background-color: var(--terracotta);
+    color: var(--white);
+}
+
+/* --- Tip of the Day Section --- */
+.tip-section {
+    background-color: var(--old-rose);
+    color: var(--white);
+    padding: 4rem 5%;
+    text-align: center;
+}
+
+.tip-section h2 {
+    color: var(--white);
+    margin-bottom: 1.5rem;
+    font-size: 2.2rem;
+}
+
+.tip-content {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 2.5rem;
+    border-radius: 12px;
+    border-left: 5px solid var(--cream);
+    max-width: 800px;
+    margin: 0 auto;
+    font-style: italic;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* --- Contact Form Section --- */
+.contact-section {
+    padding: 5rem 5%;
+    background-color: var(--cream);
+}
+
+.contact-section h2 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 2.5rem;
+    color: var(--terracotta);
+}
+
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--white);
+    padding: 3rem 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+}
+
+.form-group {
+    margin-bottom: 1.8rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.6rem;
+    color: var(--old-rose);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ecc9ce;
+    border-radius: 8px;
+    font-family: inherit;
+    background-color: #fafafa;
+    transition: all 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--terracotta);
+    box-shadow: 0 0 0 3px rgba(204, 120, 99, 0.15);
+    background-color: var(--white);
+}
+
+.submit-btn {
+    background-color: var(--terracotta);
+    color: var(--white);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1.1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: var(--old-rose);
+    transform: scale(1.02);
+}
+
+/* --- Footer --- */
+footer {
+    background-color: var(--text-dark);
+    color: var(--cream);
+    text-align: center;
+    padding: 3rem 5%;
+}
+
+footer h2 {
+    color: var(--old-rose);
+    margin-bottom: 1rem;
+}
+
+footer p {
+    color: #b5acae;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+/* --- Media Queries (Adaptación de Tablet y Desktop) --- */
+@media (min-width: 768px) {
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .hero h2 {
+        font-size: 3.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .cards-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* --- Widget de Chatbot Flotante --- */
+.chatbot-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 999;
+}
+
+.chatbot-toggle-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--terracotta);
+    color: var(--white);
+    font-size: 1.8rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(204, 120, 99, 0.4);
+    transition: transform 0.3s ease, background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatbot-toggle-btn:hover {
+    transform: scale(1.1);
+    background-color: var(--old-rose);
+}
+
+.chatbot-modal {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 320px;
+    background-color: var(--white);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.3s, transform 0.3s;
+    transform-origin: bottom right;
+}
+
+.chatbot-modal.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+}
+
+.chatbot-header {
+    background-color: var(--old-rose);
+    color: var(--white);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Playfair Display', serif;
+}
+
+.chatbot-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--cream);
+}
+
+.close-chatbot-btn {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.close-chatbot-btn:hover {
+    transform: rotate(90deg);
+}
+
+.chatbot-body {
+    padding: 1rem;
+    height: 300px;
+    overflow-y: auto;
+    background-color: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.chat-message {
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    max-width: 85%;
+    line-height: 1.4;
+}
+
+.bot-message {
+    background-color: var(--cream);
+    color: var(--text-dark);
+    border: 1px solid #eee;
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+}
+
+.user-message {
+    background-color: var(--terracotta);
+    color: var(--white);
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+}
+
+.chatbot-footer {
+    display: flex;
+    padding: 0.8rem;
+    border-top: 1px solid #eee;
+    background-color: var(--white);
+}
+
+.chatbot-input {
+    flex-grow: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 0.6rem 1rem;
+    outline: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+}
+
+.chatbot-input:focus {
+    border-color: var(--old-rose);
+}
+
+.chatbot-send-btn {
+    background-color: transparent;
+    color: var(--terracotta);
+    border: none;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    padding: 0 0.5rem;
+    transition: color 0.2s;
+}
+
+.chatbot-send-btn:hover {
+    color: var(--old-rose);
+}

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Radiance | Cuidado Personal Femenino</title>
+
+    <!-- Fuentes de Google (Montserrat para textos y Playfair Display para titulares) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Enlace a la hoja de estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Lumina Radiance</h1>
+    </header>
+
+<main>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h2>Abraza tu Belleza Auténtica</h2>
+        <p>Nuestra línea de productos está cuidadosamente diseñada para potenciar tu seguridad, cuidando tu piel con ingredientes nobles y de la más alta calidad.</p>
+    </section>
+
+    <!-- Sección de Tarjetas generadas dinámicamente -->
+    <section class="products-section">
+        <h2>Nuestras Colecciones</h2>
+        <div class="cards-container" id="cards-container">
+            <!-- Las tarjetas se generan con JavaScript -->
+        </div>
+    </section>
+
+    <!-- Consejo del día (Aleatorio) -->
+    <section class="tip-section">
+        <h2>✨ Tu Consejo de Belleza del Día</h2>
+        <div class="tip-content">
+            <p id="daily-tip"></p>
+        </div>
+    </section>
+
+    <!-- Maquetado de Formulario de Contacto -->
+    <section class="contact-section">
+        <h2>Ponte en Contacto</h2>
+        <form class="contact-form" action="#" method="POST">
+            <div class="form-group">
+                <label for="name">Tu Nombre</label>
+                <input type="text" id="name" name="name" placeholder="Ej. Mariana López" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Tu Correo Electrónico</label>
+                <input type="email" id="email" name="email" placeholder="mariana@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="message">Mensaje, Consulta o Testimonio</label>
+                <textarea id="message" name="message" rows="5" placeholder="¿En qué te podemos asesorar en tu rutina de belleza?" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Enviar Mensaje</button>
+        </form>
+    </section>
+</main>
+
+<!-- Widget: Botón Flotante y Modal del Chatbot -->
+<div class="chatbot-container">
+    <button id="chatbot-toggle-btn" class="chatbot-toggle-btn">
+        💬
+    </button>
+    <div id="chatbot-modal" class="chatbot-modal hidden">
+        <div class="chatbot-header">
+            <h4>LuminaBot ✨</h4>
+            <button id="close-chatbot-btn" class="close-chatbot-btn">✖</button>
+        </div>
+        <div class="chatbot-body">
+            <div class="chat-message bot-message">
+                <p>¡Hola! Soy LuminaBot, tu asesora de belleza virtual. ¿En qué te puedo ayudar hoy con tu rutina de cuidado?</p>
+            </div>
+            <!-- Aquí irían los demás mensajes dinámicos después del entrenamiento -->
+        </div>
+        <div class="chatbot-footer">
+            <input type="text" placeholder="Escribe tu mensaje aquí..." class="chatbot-input">
+            <button class="chatbot-send-btn">Enviar</button>
+        </div>
+    </div>
+</div>
+
+    <footer>
+        <h2>Lumina Radiance</h2>
+        <p>Hecho con amor y dedicación para realzar la belleza natural de cada mujer.</p>
+        <p>&copy; <span id="current-year"></span> Lumina Radiance. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
+
+<script>
+    // ============================================================
+    // DATOS (antes en data.php)
+    // ============================================================
+    const cosmeticos = [
+        {
+            title: 'Cuidado Facial',
+            short_description: 'Descubre nuestra línea de cremas hidratantes y serums para mantener tu piel radiante, suave y llena de vida cada día.',
+            full_description: 'Productos diseñados con ingredientes puros que penetran en las capas más profundas de tu cutis para combatir la resequedad, prevenir los signos de la edad y devolverle a tu rostro su luminosidad natural.',
+            image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80'
+        },
+        {
+            title: 'Maquillaje Natural',
+            short_description: 'Realza tu belleza auténtica con bases ligeras, iluminadores sutiles y tonos neutros que, además de embellecer, cuidan y protegen tu piel.',
+            full_description: 'Esta colección está pensada para el día a día, ofreciendo acabados sedosos que no obstruyen los poros, permitiendo que tu piel respire mientras luces un aspecto fresco y saludable.',
+            image: 'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=600&q=80'
+        },
+        {
+            title: 'Cuidado Corporal',
+            short_description: 'Lociones y exfoliantes formulados con ingredientes 100% naturales para una piel profundamente hidratada y renovada.',
+            full_description: 'Disfruta de una experiencia de spa en casa con texturas ricas y aromas relajantes que nutren tu cuerpo de pies a cabeza, mejorando la elasticidad y dejando una sensación de suavidad duradera.',
+            image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=600&q=80'
+        }
+    ];
+
+    const tips = [
+        "Recuerda siempre limpiar tu rostro antes de dormir. Esto permite que tu piel respire y se regenere durante la noche.",
+        "La hidratación empieza desde adentro: no olvides beber al menos 2 litros de agua diarios para una piel verdaderamente luminosa.",
+        "Aplica protector solar todos los días del año, incluso en días nublados o si pasas mucho tiempo frente a la pantalla.",
+        "Un suave masaje facial ascendente al aplicar tus cremas estimula la circulación y ayuda a prevenir la pérdida de firmeza.",
+        "Menos es más: permite que tu piel descanse de los cosméticos más pesados al menos durante un día a la semana."
+    ];
+
+    // ============================================================
+    // RENDERIZADO DE TARJETAS (antes con foreach de PHP)
+    // ============================================================
+    const cardsContainer = document.getElementById('cards-container');
+    cosmeticos.forEach(item => {
+        const article = document.createElement('article');
+        article.classList.add('card');
+        article.innerHTML = `
+            <img src="${item.image}" alt="Imagen de ${item.title}">
+            <div class="card-content">
+                <h3>${item.title}</h3>
+                <p class="short-desc">${item.short_description}</p>
+                <p class="full-desc hidden">${item.full_description}</p>
+                <button class="read-more-btn" onclick="toggleDescription(this)">Ver más</button>
+            </div>
+        `;
+        cardsContainer.appendChild(article);
+    });
+
+    // ============================================================
+    // CONSEJO ALEATORIO DEL DÍA (antes con array_rand de PHP)
+    // ============================================================
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    document.getElementById('daily-tip').textContent = `"${randomTip}"`;
+
+    // ============================================================
+    // AÑO ACTUAL EN EL FOOTER (antes con date('Y') de PHP)
+    // ============================================================
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+    // ============================================================
+    // TOGGLE DE DESCRIPCIÓN DE TARJETAS
+    // ============================================================
+    function toggleDescription(button) {
+        const cardContent = button.parentElement;
+        const shortDesc = cardContent.querySelector('.short-desc');
+        const fullDesc = cardContent.querySelector('.full-desc');
+
+        if (fullDesc.classList.contains('hidden')) {
+            fullDesc.classList.remove('hidden');
+            button.textContent = 'Ver menos';
+        } else {
+            fullDesc.classList.add('hidden');
+            button.textContent = 'Ver más';
+        }
+    }
+
+    // ============================================================
+    // FUNCIONALIDAD DEL CHATBOT FLOTANTE
+    // ============================================================
+    document.addEventListener("DOMContentLoaded", function() {
+        const toggleBtn = document.getElementById('chatbot-toggle-btn');
+        const modal = document.getElementById('chatbot-modal');
+        const closeBtn = document.getElementById('close-chatbot-btn');
+
+        // Abre / Cierra el popup al hacer click en el botón flotante principal
+        toggleBtn.addEventListener('click', () => {
+            modal.classList.toggle('hidden');
+        });
+
+        // Cierra el popup al hacer click en la "X" del Header
+        closeBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // ---------- LÓGICA DEL CHATBOT RAG ----------
+        const chatInput = document.querySelector('.chatbot-input');
+        const sendBtn = document.querySelector('.chatbot-send-btn');
+        const chatBody = document.querySelector('.chatbot-body');
+
+        // ============================================================
+        // RAG ENGINE — lee base.txt, chunkea por secciones y busca
+        // ============================================================
+        let ragChunks = [];
+
+        // Palabras vacías en español para ignorar en el matching
+        const STOP_WORDS = new Set([
+            'de','la','el','en','es','se','un','una','que','por','con',
+            'del','los','las','sus','para','como','pero','mas','muy',
+            'hay','ser','fue','son','han','nos','al','su','tu','mi',
+            'lo','le','ya','si','no','yo'
+        ]);
+
+        // Normalizar texto: minúsculas, sin acentos, sin puntuación
+        function normalizeText(text) {
+            return text.toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^\w\s]/gi, ' ')
+                .replace(/\s+/g, ' ').trim();
+        }
+
+        // Extraer keywords útiles de un texto
+        function extractKeywords(text) {
+            return normalizeText(text)
+                .split(' ')
+                .filter(w => w.length > 1 && !STOP_WORDS.has(w));
+        }
+
+        // Cargar y chunkear base.txt por secciones == TÍTULO ==
+        async function loadRAGBase() {
+            try {
+                const res = await fetch('base.txt');
+                if (!res.ok) throw new Error('No se pudo cargar base.txt');
+                const raw = await res.text();
+
+                // Dividir por líneas que empiecen y terminen con ==
+                const sections = raw.split(/\n(?=={2})/);
+                ragChunks = sections
+                    .map(s => s.trim())
+                    .filter(s => s.length > 30)   // descartar vacíos
+                    .map(s => {
+                        // Separar el título del cuerpo
+                        const lines = s.split('\n');
+                        const title = lines[0].replace(/={2,}/g, '').trim();
+                        const body = lines.slice(1).join(' ').trim();
+                        return { title, body, full: title + ' ' + body };
+                    });
+
+                console.log(`✅ RAG listo — ${ragChunks.length} secciones cargadas desde base.txt`);
+            } catch (err) {
+                console.error('Error cargando base.txt:', err);
+                // Fallback: un chunk genérico para no romper la interfaz
+                ragChunks = [{
+                    title: 'Lumina Radiance',
+                    body: 'Somos una marca de cosméticos para el cuidado personal femenino. Puedes contactarnos a través del formulario al final de la página.',
+                    full: 'lumina radiance cuidado personal femenino contacto formulario'
+                }];
+                addBotMessage("Estoy teniendo problemas para cargar mi base de conocimiento. Por favor, inténtalo de nuevo más tarde. 🙏");
+            }
+        }
+
+        // ---- Búsqueda RAG mejorada: bigrams + densidad + peso en título ----
+        function findBestChunk(userText) {
+            if (ragChunks.length === 0) return "Aún estoy cargando mi base de conocimiento, intenta en un momento.";
+
+            const queryKeywords = extractKeywords(userText);
+            if (queryKeywords.length === 0) return "¿Puedes contarme un poco más sobre lo que necesitas? 😊";
+
+            // Generar bigrams de la query (pares de palabras consecutivas)
+            const queryBigrams = [];
+            for (let i = 0; i < queryKeywords.length - 1; i++) {
+                queryBigrams.push(queryKeywords[i] + ' ' + queryKeywords[i + 1]);
+            }
+
+            const normQuery = normalizeText(userText);
+
+            let bestChunk = null;
+            let bestScore = -1;
+
+            for (const chunk of ragChunks) {
+                const chunkWords = extractKeywords(chunk.full);
+                const normTitle  = normalizeText(chunk.title);
+                const normBody   = normalizeText(chunk.body);
+                let score = 0;
+
+                // 1) Coincidencia de keywords en el CUERPO
+                for (const kw of queryKeywords) {
+                    if (chunkWords.includes(kw))                             score += 2;
+                    else if (chunkWords.some(w => w.includes(kw) || (kw.length > 4 && kw.includes(w)))) score += 1;
+                }
+
+                // 2) Bonus por BIGRAMS (frases de dos palabras) en cuerpo
+                for (const bg of queryBigrams) {
+                    if (normBody.includes(bg)) score += 4;
+                }
+
+                // 3) Peso alto si la keyword aparece en el TÍTULO (x5 por palabra)
+                for (const kw of queryKeywords) {
+                    if (normTitle.includes(kw)) score += 5;
+                }
+
+                // 4) Bonus por bigrams en el TÍTULO
+                for (const bg of queryBigrams) {
+                    if (normTitle.includes(bg)) score += 8;
+                }
+
+                // 5) Bonus si la frase completa normalizada aparece en el chunk
+                if (normBody.includes(normQuery) || normTitle.includes(normQuery)) score += 15;
+
+                // 6) Normalizar por densidad: dividir por la raíz de keywords del chunk
+                //    Favorece chunks más cortos y específicos sobre chunks muy genéricos
+                const density = score / Math.sqrt(Math.max(chunkWords.length, 1));
+
+                if (density > bestScore) {
+                    bestScore = density;
+                    bestChunk = chunk;
+                }
+            }
+
+            if (bestScore > 0 && bestChunk) {
+                // Limpia el título: quita los == y muestra legible
+                const cleanTitle = bestChunk.title
+                    .replace(/={2,}/g, '').trim()
+                    .split(' ').slice(0, 6).join(' ');  // máx 6 palabras del título
+                return `💡 **${cleanTitle}**\n\n${bestChunk.body}`;
+            }
+
+            return "No encontré información específica sobre eso en mi base de conocimiento. ¿Puedes reformular tu pregunta o contactarnos a través del formulario al final de la página? 💌";
+        }
+
+        // Cargar la base al iniciar
+        loadRAGBase();
+
+
+        // Agregar mensaje de Usuario a la UI
+        function addUserMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', 'user-message');
+            messageDiv.textContent = text;
+            chatBody.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Agregar mensaje del Bot a la UI
+        function addBotMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', 'bot-message');
+            messageDiv.innerHTML = text;
+            chatBody.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Mantener el scroll siempre abajo
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Procesar Entrada
+        function handleQuery() {
+            const text = chatInput.value.trim();
+            if (text === '') return;
+
+            addUserMessage(text);
+            chatInput.value = '';
+
+            setTimeout(() => {
+                const response = findBestChunk(text);
+                // Convertir saltos de línea y negritas **texto** a HTML
+                const formatted = response
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>');
+                addBotMessage(formatted);
+            }, 600);
+        }
+
+        // Event Listeners (Clics y Enter en teclado)
+        sendBtn.addEventListener('click', handleQuery);
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleQuery();
+            }
+        });
+    });
+</script>
