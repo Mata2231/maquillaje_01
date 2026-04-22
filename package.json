@@ -1,0 +1,11 @@
+{
+  "name": "lumina-radiance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lumina Radiance - Cosméticos con chatbot RAG",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "groq-sdk": "^0.12.0"
+  }
+}

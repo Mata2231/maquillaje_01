@@ -1,2 +1,2 @@
-# maquillaje_01
-maquillaje_01
+# cosmeticos
+cosmeticos

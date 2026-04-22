@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumina Radiance | Cuidado Personal Femenino</title>
-
+    
     <!-- Fuentes de Google (Montserrat para textos y Playfair Display para titulares) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-
+    
     <!-- Enlace a la hoja de estilos -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -76,7 +76,6 @@
             <div class="chat-message bot-message">
                 <p>¡Hola! Soy LuminaBot, tu asesora de belleza virtual. ¿En qué te puedo ayudar hoy con tu rutina de cuidado?</p>
             </div>
-            <!-- Aquí irían los demás mensajes dinámicos después del entrenamiento -->
         </div>
         <div class="chatbot-footer">
             <input type="text" placeholder="Escribe tu mensaje aquí..." class="chatbot-input">
@@ -95,7 +94,7 @@
 
 <script>
     // ============================================================
-    // DATOS (antes en data.php)
+    // DATOS (equivalente a data.php)
     // ============================================================
     const cosmeticos = [
         {
@@ -127,37 +126,43 @@
     ];
 
     // ============================================================
-    // RENDERIZADO DE TARJETAS (antes con foreach de PHP)
+    // RENDERIZADO DE TARJETAS (equivalente al foreach de PHP)
     // ============================================================
-    const cardsContainer = document.getElementById('cards-container');
-    cosmeticos.forEach(item => {
-        const article = document.createElement('article');
-        article.classList.add('card');
-        article.innerHTML = `
-            <img src="${item.image}" alt="Imagen de ${item.title}">
-            <div class="card-content">
-                <h3>${item.title}</h3>
-                <p class="short-desc">${item.short_description}</p>
-                <p class="full-desc hidden">${item.full_description}</p>
-                <button class="read-more-btn" onclick="toggleDescription(this)">Ver más</button>
-            </div>
-        `;
-        cardsContainer.appendChild(article);
-    });
+    function renderCards() {
+        const container = document.getElementById('cards-container');
+        cosmeticos.forEach(item => {
+            const article = document.createElement('article');
+            article.classList.add('card');
+            article.innerHTML = `
+                <img src="${item.image}" alt="Imagen de ${item.title}">
+                <div class="card-content">
+                    <h3>${item.title}</h3>
+                    <p class="short-desc">${item.short_description}</p>
+                    <p class="full-desc hidden">${item.full_description}</p>
+                    <button class="read-more-btn" onclick="toggleDescription(this)">Ver más</button>
+                </div>
+            `;
+            container.appendChild(article);
+        });
+    }
 
     // ============================================================
-    // CONSEJO ALEATORIO DEL DÍA (antes con array_rand de PHP)
+    // CONSEJO ALEATORIO (equivalente al array_rand de PHP)
     // ============================================================
-    const randomTip = tips[Math.floor(Math.random() * tips.length)];
-    document.getElementById('daily-tip').textContent = `"${randomTip}"`;
+    function renderRandomTip() {
+        const randomIndex = Math.floor(Math.random() * tips.length);
+        document.getElementById('daily-tip').textContent = `"${tips[randomIndex]}"`;
+    }
 
     // ============================================================
-    // AÑO ACTUAL EN EL FOOTER (antes con date('Y') de PHP)
+    // AÑO ACTUAL EN EL FOOTER (equivalente al date('Y') de PHP)
     // ============================================================
-    document.getElementById('current-year').textContent = new Date().getFullYear();
+    function renderYear() {
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    }
 
     // ============================================================
-    // TOGGLE DE DESCRIPCIÓN DE TARJETAS
+    // TOGGLE DESCRIPCIÓN DE TARJETAS
     // ============================================================
     function toggleDescription(button) {
         const cardContent = button.parentElement;
@@ -174,209 +179,132 @@
     }
 
     // ============================================================
-    // FUNCIONALIDAD DEL CHATBOT FLOTANTE
+    // CHATBOT
     // ============================================================
     document.addEventListener("DOMContentLoaded", function() {
+        // Inicializar contenido dinámico
+        renderCards();
+        renderRandomTip();
+        renderYear();
+
         const toggleBtn = document.getElementById('chatbot-toggle-btn');
         const modal = document.getElementById('chatbot-modal');
         const closeBtn = document.getElementById('close-chatbot-btn');
 
-        // Abre / Cierra el popup al hacer click en el botón flotante principal
         toggleBtn.addEventListener('click', () => {
             modal.classList.toggle('hidden');
         });
 
-        // Cierra el popup al hacer click en la "X" del Header
         closeBtn.addEventListener('click', () => {
             modal.classList.add('hidden');
         });
 
-        // ---------- LÓGICA DEL CHATBOT RAG ----------
+        // ============================================================
+        // RAG CHATBOT — Conecta al backend /api/chat (Retriever + Groq)
+        // ============================================================
         const chatInput = document.querySelector('.chatbot-input');
         const sendBtn = document.querySelector('.chatbot-send-btn');
         const chatBody = document.querySelector('.chatbot-body');
 
+        // Convertir markdown básico a HTML para respuestas más lindas
+        function markdownToHtml(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **negrita**
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')               // *cursiva*
+                .replace(/\n/g, '<br>');                            // saltos de línea
+        }
+
         // ============================================================
-        // RAG ENGINE — lee base.txt, chunkea por secciones y busca
+        // UI DEL CHATBOT
         // ============================================================
-        let ragChunks = [];
 
-        // Palabras vacías en español para ignorar en el matching
-        const STOP_WORDS = new Set([
-            'de','la','el','en','es','se','un','una','que','por','con',
-            'del','los','las','sus','para','como','pero','mas','muy',
-            'hay','ser','fue','son','han','nos','al','su','tu','mi',
-            'lo','le','ya','si','no','yo'
-        ]);
-
-        // Normalizar texto: minúsculas, sin acentos, sin puntuación
-        function normalizeText(text) {
-            return text.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^\w\s]/gi, ' ')
-                .replace(/\s+/g, ' ').trim();
-        }
-
-        // Extraer keywords útiles de un texto
-        function extractKeywords(text) {
-            return normalizeText(text)
-                .split(' ')
-                .filter(w => w.length > 1 && !STOP_WORDS.has(w));
-        }
-
-        // Cargar y chunkear base.txt por secciones == TÍTULO ==
-        async function loadRAGBase() {
-            try {
-                const res = await fetch('base.txt');
-                if (!res.ok) throw new Error('No se pudo cargar base.txt');
-                const raw = await res.text();
-
-                // Dividir por líneas que empiecen y terminen con ==
-                const sections = raw.split(/\n(?=={2})/);
-                ragChunks = sections
-                    .map(s => s.trim())
-                    .filter(s => s.length > 30)   // descartar vacíos
-                    .map(s => {
-                        // Separar el título del cuerpo
-                        const lines = s.split('\n');
-                        const title = lines[0].replace(/={2,}/g, '').trim();
-                        const body = lines.slice(1).join(' ').trim();
-                        return { title, body, full: title + ' ' + body };
-                    });
-
-                console.log(`✅ RAG listo — ${ragChunks.length} secciones cargadas desde base.txt`);
-            } catch (err) {
-                console.error('Error cargando base.txt:', err);
-                // Fallback: un chunk genérico para no romper la interfaz
-                ragChunks = [{
-                    title: 'Lumina Radiance',
-                    body: 'Somos una marca de cosméticos para el cuidado personal femenino. Puedes contactarnos a través del formulario al final de la página.',
-                    full: 'lumina radiance cuidado personal femenino contacto formulario'
-                }];
-                addBotMessage("Estoy teniendo problemas para cargar mi base de conocimiento. Por favor, inténtalo de nuevo más tarde. 🙏");
-            }
-        }
-
-        // ---- Búsqueda RAG mejorada: bigrams + densidad + peso en título ----
-        function findBestChunk(userText) {
-            if (ragChunks.length === 0) return "Aún estoy cargando mi base de conocimiento, intenta en un momento.";
-
-            const queryKeywords = extractKeywords(userText);
-            if (queryKeywords.length === 0) return "¿Puedes contarme un poco más sobre lo que necesitas? 😊";
-
-            // Generar bigrams de la query (pares de palabras consecutivas)
-            const queryBigrams = [];
-            for (let i = 0; i < queryKeywords.length - 1; i++) {
-                queryBigrams.push(queryKeywords[i] + ' ' + queryKeywords[i + 1]);
-            }
-
-            const normQuery = normalizeText(userText);
-
-            let bestChunk = null;
-            let bestScore = -1;
-
-            for (const chunk of ragChunks) {
-                const chunkWords = extractKeywords(chunk.full);
-                const normTitle  = normalizeText(chunk.title);
-                const normBody   = normalizeText(chunk.body);
-                let score = 0;
-
-                // 1) Coincidencia de keywords en el CUERPO
-                for (const kw of queryKeywords) {
-                    if (chunkWords.includes(kw))                             score += 2;
-                    else if (chunkWords.some(w => w.includes(kw) || (kw.length > 4 && kw.includes(w)))) score += 1;
-                }
-
-                // 2) Bonus por BIGRAMS (frases de dos palabras) en cuerpo
-                for (const bg of queryBigrams) {
-                    if (normBody.includes(bg)) score += 4;
-                }
-
-                // 3) Peso alto si la keyword aparece en el TÍTULO (x5 por palabra)
-                for (const kw of queryKeywords) {
-                    if (normTitle.includes(kw)) score += 5;
-                }
-
-                // 4) Bonus por bigrams en el TÍTULO
-                for (const bg of queryBigrams) {
-                    if (normTitle.includes(bg)) score += 8;
-                }
-
-                // 5) Bonus si la frase completa normalizada aparece en el chunk
-                if (normBody.includes(normQuery) || normTitle.includes(normQuery)) score += 15;
-
-                // 6) Normalizar por densidad: dividir por la raíz de keywords del chunk
-                //    Favorece chunks más cortos y específicos sobre chunks muy genéricos
-                const density = score / Math.sqrt(Math.max(chunkWords.length, 1));
-
-                if (density > bestScore) {
-                    bestScore = density;
-                    bestChunk = chunk;
-                }
-            }
-
-            if (bestScore > 0 && bestChunk) {
-                // Limpia el título: quita los == y muestra legible
-                const cleanTitle = bestChunk.title
-                    .replace(/={2,}/g, '').trim()
-                    .split(' ').slice(0, 6).join(' ');  // máx 6 palabras del título
-                return `💡 **${cleanTitle}**\n\n${bestChunk.body}`;
-            }
-
-            return "No encontré información específica sobre eso en mi base de conocimiento. ¿Puedes reformular tu pregunta o contactarnos a través del formulario al final de la página? 💌";
-        }
-
-        // Cargar la base al iniciar
-        loadRAGBase();
-
-
-        // Agregar mensaje de Usuario a la UI
         function addUserMessage(text) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('chat-message', 'user-message');
-            messageDiv.textContent = text;
-            chatBody.appendChild(messageDiv);
+            const div = document.createElement('div');
+            div.classList.add('chat-message', 'user-message');
+            div.textContent = text;
+            chatBody.appendChild(div);
             scrollToBottom();
         }
 
-        // Agregar mensaje del Bot a la UI
-        function addBotMessage(text) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('chat-message', 'bot-message');
-            messageDiv.innerHTML = text;
-            chatBody.appendChild(messageDiv);
+        function addBotMessage(html) {
+            const div = document.createElement('div');
+            div.classList.add('chat-message', 'bot-message');
+            div.innerHTML = html;
+            chatBody.appendChild(div);
             scrollToBottom();
         }
 
-        // Mantener el scroll siempre abajo
+        function showTypingIndicator() {
+            const div = document.createElement('div');
+            div.classList.add('chat-message', 'bot-message', 'typing-indicator');
+            div.id = 'typing-indicator';
+            div.innerHTML = '<span></span><span></span><span></span>';
+            chatBody.appendChild(div);
+            scrollToBottom();
+            return div;
+        }
+
+        function removeTypingIndicator() {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
         function scrollToBottom() {
             chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        // Procesar Entrada
-        function handleQuery() {
+        // ============================================================
+        // HANDLER — Envía la pregunta al backend RAG (/api/chat)
+        // ============================================================
+        async function handleQuery() {
             const text = chatInput.value.trim();
-            if (text === '') return;
+            if (!text) return;
 
             addUserMessage(text);
             chatInput.value = '';
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
 
-            setTimeout(() => {
-                const response = findBestChunk(text);
-                // Convertir saltos de línea y negritas **texto** a HTML
-                const formatted = response
-                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\n/g, '<br>');
-                addBotMessage(formatted);
-            }, 600);
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text }),
+                });
+
+                removeTypingIndicator();
+
+                if (!response.ok) {
+                    throw new Error(`Error del servidor (${response.status})`);
+                }
+
+                const data = await response.json();
+                const htmlReply = markdownToHtml(data.reply);
+                addBotMessage(htmlReply);
+
+                // Log de debug en consola
+                if (data.debug) {
+                    console.log(`📚 RAG: ${data.debug.chunksUsed} chunks usados | Scores: ${data.debug.topScores?.join(', ')}`);
+                }
+
+            } catch (error) {
+                removeTypingIndicator();
+                console.error('Error en chatbot RAG:', error);
+                addBotMessage('Disculpa, tuve un problema al procesar tu pregunta. ¿Podrías intentarlo de nuevo? 🌸');
+            } finally {
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.focus();
+            }
         }
 
-        // Event Listeners (Clics y Enter en teclado)
         sendBtn.addEventListener('click', handleQuery);
-        chatInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                handleQuery();
-            }
+        chatInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') handleQuery();
         });
+
+        console.log('✅ LuminaBot RAG: conectado al backend /api/chat (Groq + TF-IDF)');
     });
 </script>
