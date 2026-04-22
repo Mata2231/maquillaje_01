@@ -114,6 +114,10 @@ try {
 function retrieveTopK(query, k = 4) {
   if (chunkIndex.length === 0) return [];
 
+  // Detectar saludos y despedidas — responder sin necesidad de contexto específico
+  const greetings = /^(hola|buenas|buenos|hi|hey|saludos|buen dia|buen tarde|buen noche|como estas|que tal|gracias|adios|chao|bye|hasta luego|de nada)/i;
+  if (greetings.test(query.trim())) return [];
+
   const queryTokens = tokenize(query);
   if (queryTokens.length === 0) return [];
 
@@ -126,8 +130,16 @@ function retrieveTopK(query, k = 4) {
   }));
 
   scored.sort((a, b) => b.score - a.score);
-  // Umbral mínimo de relevancia: 0.05
-  return scored.slice(0, k).filter((s) => s.score > 0.05);
+
+  // Devolver los que superan el umbral
+  const relevant = scored.slice(0, k).filter((s) => s.score > 0.05);
+
+  // Si no hay suficiente relevancia, devolver al menos los top 2 como contexto general
+  if (relevant.length === 0) {
+    return scored.slice(0, 2);
+  }
+
+  return relevant;
 }
 
 // ============================================================
@@ -136,15 +148,16 @@ function retrieveTopK(query, k = 4) {
 
 const SYSTEM_PROMPT = `Eres LuminaBot, la asesora de belleza virtual de Lumina Radiance — una tienda de cosméticos para el cuidado personal femenino.
 
-REGLAS ESTRICTAS:
-1. Responde ÚNICAMENTE con la información del CONTEXTO proporcionado abajo. NO inventes productos, precios ni datos que no estén en el contexto.
-2. Si el contexto no tiene información suficiente, dilo amablemente y sugiere temas en los que sí puedes ayudar.
-3. Tono cálido, femenino y profesional. Usa 1-3 emojis por respuesta.
-4. Usa viñetas (•), negritas (**texto**) y saltos de línea para respuestas claras y fáciles de leer.
-5. Respuestas concisas pero completas (máximo 180 palabras).
-6. Termina siempre con una pregunta o invitación a seguir conversando.
-7. Si el usuario saluda, preséntate brevemente y ofrece ayuda.
-8. Si el usuario se despide, despídete de forma cálida.`;
+REGLAS:
+1. Si el usuario saluda (hola, buenas, hi, etc.), responde de forma cálida, preséntate y ofrece ayuda. NO digas que no tienes información.
+2. Si el usuario se despide o agradece, responde de forma amigable sin mencionar la base de conocimiento.
+3. Para preguntas de belleza o productos, usa ÚNICAMENTE la información del CONTEXTO proporcionado. No inventes datos.
+4. Si el contexto no es suficiente para una pregunta específica, dilo amablemente y sugiere temas relacionados.
+5. Tono cálido, femenino y profesional. Usa 1-3 emojis por respuesta.
+6. Usa viñetas (•) y negritas (**texto**) para respuestas claras.
+7. Máximo 180 palabras. Termina siempre con una pregunta o invitación a seguir conversando.
+
+Temas en los que puedes ayudar: rutinas de skincare, tipos de piel, maquillaje, productos de Lumina Radiance (Cuidado Facial, Maquillaje Natural, Cuidado Corporal), consejos de belleza, ingredientes activos y cuidado corporal.`;
 
 async function generateResponse(userMessage, contextChunks) {
   const contextText = contextChunks.length > 0
